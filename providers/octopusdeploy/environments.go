@@ -7,18 +7,18 @@ import (
 	"github.com/OctopusDeploy/go-octopusdeploy/octopusdeploy"
 )
 
-type TagSetGenerator struct {
+type EnvironmentGenerator struct {
 	OctopusDeployService
 }
 
-func (g *TagSetGenerator) InitResources() error {
+func (g *EnvironmentGenerator) InitResources() error {
 	client, err := g.Client()
 	if err != nil {
 		return err
 	}
 
 	funcs := []func(*octopusdeploy.Client) error{
-		g.createTagSetResources,
+		g.createEnvironmentResources,
 	}
 
 	for _, f := range funcs {
@@ -31,17 +31,17 @@ func (g *TagSetGenerator) InitResources() error {
 	return nil
 }
 
-func (g *TagSetGenerator) createTagSetResources(client *octopusdeploy.Client) error {
-	ressources, err := client.TagSet.GetAll()
+func (g *EnvironmentGenerator) createEnvironmentResources(client *octopusdeploy.Client) error {
+	tagSets, err := client.Environment.GetAll()
 	if err != nil {
 		return err
 	}
 
-	for _, ressource := range *ressources {
+	for _, tagSet := range *tagSets {
 		g.Resources = append(g.Resources, terraform_utils.NewSimpleResource(
-			fmt.Sprintf("%s", ressource.ID),
-			fmt.Sprintf("%s", ressource.Name),
-			"octopusdeploy_tag_set",
+			fmt.Sprintf("%s", tagSet.ID),
+			fmt.Sprintf("%s", tagSet.Name),
+			"octopusdeploy_environment",
 			g.ProviderName,
 			[]string{},
 		))
